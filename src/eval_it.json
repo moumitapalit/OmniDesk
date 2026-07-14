@@ -1,0 +1,227 @@
+[
+  {
+    "query": "User Marcus Delgado (mdelgado, EMP-40291) from the Phoenix office reset their password through the Password Reset Portal after multiple failed sign-in attempts, but remained unable to access the SSO Portal (https://sso.corplabs.com) or email because the account was still showing as locked. AD security evidence on DC-EAST-02.corplabs.internal indicates repeated authentication failures (Event ID 4625) continued from an iOS mobile device at IP 10.47.83.112 using stale cached credentials, preventing the new password from taking effect and blocking normal account access.",
+    "gold_family": 2,
+    "gold_root_cause": "Active Directory lockout policy was triggered by repeated failed authentication attempts from a mobile device holding cached or expired credentials. After the user reset the password, the failing mobile authentication source continued submitting stale credentials, and the prior reset token state did not successfully restore access before the account relocked."
+  },
+  {
+    "query": "After a scheduled password change on 2025-11-19, I (emp ID E-20487) could still sign in from my desktop (WORKSTATION-MBP-RCHEN) but could not complete SSO authentication on my iOS mobile device (IPHONE-RCHEN-14). The phone began showing account locked after repeated failed attempts, and a self-service password reset via https://passwordreset.corplabs.com did not resolve the issue because the reset token had expired and the updated credentials were not propagating to the mobile device. This blocked mobile access to corporate SSO-connected applications including Outlook, Teams, and ServiceNow until the account was unlocked and cached mobile credentials were cleared. My username is rchen and I'm based in the Arlington office.",
+    "gold_family": 2,
+    "gold_root_cause": "Active Directory lockout policy was triggered by repeated authentication attempts from the user's mobile device using stale cached credentials after a password change, while the original password reset token had expired and did not propagate successfully to the device."
+  },
+  {
+    "query": "I reset their corporate password through the Password Reset Portal for user mgarcia (employee ID EMP-40821) and could successfully sign in from the desktop, but the account was locked again shortly afterward when using the company-issued mobile device (hostname IPHONE-MGARCIA-01). Failed sign-in attempts continued from the mobile platform at IP 10.42.17.88 against Active Directory and SSO-connected services, blocking normal mobile access after the password change. The user, Maria Garcia, is based in the Charlotte office and reported the issue via phone at 704-555-3192.",
+    "gold_family": 2,
+    "gold_root_cause": "Stale cached credentials on the user's iOS mobile device continued submitting the old password to Active Directory and SSO-connected services after the self-service password reset, repeatedly triggering the AD lockout policy."
+  },
+  {
+    "query": "Overnight integration jobs for customer data synchronization (namespace: igw-custsync-prod, cluster: k8s-east-prod-07) intermittently failed through the Integration Gateway between approximately 02:00\u201303:30 UTC on 2026-05-14, delaying downstream application updates before business hours. The incident was reported by Marcus Delgado (mdelgado@corplabs.com) from the Denver operations team. The primary user-visible symptom remained timeout and job failure behavior across the /api/v2/customer-sync endpoint, but the available diagnostics did not point cleanly to expired credentials, sustained API slowness, or a consistent throttling pattern across the full incident window. Affected sync jobs included batch IDs SYNC-20260514-0200 through SYNC-20260514-0330.",
+    "gold_family": 7,
+    "gold_root_cause": "Unknown; available diagnostics were insufficient to distinguish between intermittent downstream latency, burst-based throttling, or another transient external integration condition during the overnight batch window."
+  },
+  {
+    "query": "Nightly data synchronization jobs from the Integration Gateway (namespace: intg-gateway-prod, cluster: eks-prod-east) to the downstream API Service in us-east-1 began failing at 02:00 UTC on 2025-12-05 with repeated 504 Gateway Timeout responses. Gateway pod intg-gw-worker-7b4d9 logged requests timing out after 30 seconds against endpoint https://api-internal.corpsync.io/v2/data-ingest. The last known successful full sync completed at 03:10 UTC on 2025-12-04 (job ID sync-nightly-20251204-0300). This is blocking scheduled data delivery for internal integrations relied upon by the Finance and Analytics teams. Reporter: Darren Whitfield (dwhitfield@corpmail.com), Integration Platform team. Available monitoring in Datadog shows elevated API Service latency during the job window, while retained logs do not show clear 401/403 authentication failures, leaving backend latency and API-side throttling as the primary investigated causes.",
+    "gold_family": 7,
+    "gold_root_cause": "Downstream API Service latency during the nightly processing window caused Integration Gateway requests to exceed the 30-second client timeout, resulting in repeated 504 timeouts and failed sync jobs. Token expiration was investigated but not supported by available evidence because retained logs showed no explicit authentication failures and the configured token was still present."
+  },
+  {
+    "query": "Overnight integration jobs for DataSyncApp were delayed or failed when the Integration Gateway in Kubernetes (us-east-1) experienced repeated HTTP 504 Gateway Timeout responses while calling the downstream API Service. The issue was first reported by platform engineer Marcus Delgado (mdelgado@corplabs.com) at approximately 06:15 UTC after reviewing the nightly batch run from the Arlington data center. Monitoring and traces showed sustained downstream response time increases above the gateway timeout window, which created retries, backlog growth, and delayed customer data synchronization. Affected gateway pods were running on nodes WORKSTATION-GWNODE-MD in the integration namespace. The incident impacted sync jobs servicing accounts managed by the platform-engineering user group.",
+    "gold_family": 7,
+    "gold_root_cause": "Sustained downstream API Service latency exceeded the Integration Gateway timeout window, causing HTTP 504 responses, retries, and overnight job backlog."
+  },
+  {
+    "query": "Users in the Charlotte office were trying to access the Internal Web Service at https://internalapp.corplabs.com over HTTPS, but browsers displayed certificate warnings (NET::ERR_CERT_DATE_INVALID) and dependent clients failed TLS negotiation. The outage was first reported by Maria Chen (mchen@corplabs.com) early this morning around 02:45 UTC after the service certificate expired on 2025-12-16T00:00:00Z. The load balancer (LB-EAST-CLUSTER-01) continued presenting the old expired certificate chain, preventing normal access to the internal application for all internal_users in the us-east-1-dc1 region.",
+    "gold_family": 0,
+    "gold_root_cause": "The Internal Web Service TLS certificate expired, and although a renewed certificate was available for testing on the service side, the production load balancer was not updated to present the renewed certificate and full chain. Certificate expiry alerting existed but was not acted on before expiration."
+  },
+  {
+    "query": "Users in the Austin office were trying to access the Internal Web Service (https://internal-web.corplabs.com) and dependent internal API endpoints, but browsers displayed NET::ERR_CERT_DATE_INVALID warnings and automated health checks failed TLS handshakes. The issue was first reported by Maria Chen (mchen@corplabs.com) from the DevOps team at approximately 15:45 UTC on 2025-12-14. The service began presenting an expired or incomplete certificate chain after a renewal was performed at the internal Certificate Authority without fully updating the HAProxy load balancer configuration on LB-FRONT-01. This blocked normal HTTPS access for internal users across the Austin and Denver locations and caused the incident to reappear after the initial partial fix attempted by the on-call engineer.",
+    "gold_family": 0,
+    "gold_root_cause": "The TLS certificate was renewed at the Certificate Authority, but the full certificate chain was not deployed to the HAProxy load balancer serving the Internal Web Service. As a result, some clients continued to receive an expired or incomplete chain, and existing renewal monitoring did not detect the missing chain deployment step, allowing the outage to recur after the first remediation attempt."
+  },
+  {
+    "query": "Users and internal monitoring were trying to reach the internal web service at portal.corplabs.internal over HTTPS, but browser sessions showed certificate warnings and dependent connections failed TLS validation. The issue was first reported by Maria Chen (emp ID E-40821) from the Austin office. The load balancer LB-EAST-02.corplabs.internal logged TLS handshake failures after the service certificate passed its expiration date, which blocked normal access to the internal-portal and auth-service for internal developers. Additional reports came in from developers connecting from workstations including WORKSTATION-LAPTOP-MC and IP 10.22.47.115.",
+    "gold_family": 0,
+    "gold_root_cause": "The TLS certificate deployed for the internal web service expired on 2025-12-24, and the load balancer continued serving the old certificate chain, resulting in TLS handshake failures and client certificate warnings."
+  },
+  {
+    "query": "I (Marcus Delgado, emp ID E-40291) on a corporate Surface Pro running Windows 10 Pro 21H2 at the Dallas office was blocked from Exchange Online and SharePoint because Conditional Access enforced the 'Require compliant device' policy after Intune marked the laptop (hostname WORKSTATION-SURFPRO-MD) noncompliant. Intune showed a missing encryption signal and a last device check-in about 72 hours old, so the device compliance state was not current and I could not access Microsoft 365 resources needed for normal work. My username is mdelgado and my device IP at the time was 10.42.18.77.",
+    "gold_family": 3,
+    "gold_root_cause": "The device had a stale Intune check-in and was not reporting the required BitLocker encryption compliance signal, causing Intune to evaluate the endpoint as noncompliant and Conditional Access to block access under the compliant-device requirement."
+  },
+  {
+    "query": "After a scheduled Windows 10 21H2 OS upgrade on January 2nd, I (Marcus Delgado, EMP-40218) could not access Exchange Online webmail or Teams from my corporate-managed laptop (WORKSTATION-LATITUDE-MD, IP 10.42.17.93) because Conditional Access blocked sign-in when the device appeared Noncompliant in Company Portal. The visible issue was a missing encryption signal even though the device was expected to be BitLocker protected. Intune showed the device last check-in was 9 days old (December 26), so compliance status had not refreshed after the upgrade. I'm based out of the Raleigh office and need access restored urgently for sprint deliverables.",
+    "gold_family": 3,
+    "gold_root_cause": "The OS update left the device with a stale Intune management check-in state, so BitLocker encryption status was not reported back to the compliance service. Conditional Access then enforced the noncompliant state because the required encryption signal was missing."
+  },
+  {
+    "query": "User Rachel Nguyen (employee ID EMP-40291) reported that her corporate Windows 10 laptop (hostname WORKSTATION-DELL-RN) appeared as Noncompliant in Company Portal. Conditional Access blocked her SharePoint access starting around 2026-01-02. Intune had not received a current BitLocker/encryption compliance signal from the device, and the last successful check-in was 14 days old. Rachel attempted a remote sync from Company Portal, but the compliance state did not update. She is based out of the Arlington office and reached out to the service desk after being unable to access any corporate resources for several hours.",
+    "gold_family": 3,
+    "gold_root_cause": "The device fell out of compliance because Intune was not receiving the required BitLocker encryption status signal ('EncryptionNotReported') and the device had a stale 14-day check-in, so Conditional Access continued to evaluate the endpoint as noncompliant."
+  },
+  {
+    "query": "Multiple internal users and monitoring systems reported intermittent DNS resolution failures for api.service.corp.local after an A-record change in the internal corp.local zone. The issue was initially flagged by Marcus Delgado (mdelgado@corp.local) from the internal services team and corroborated by automated health checks on host WORKSTATION-MDLG-PC. Clients attempting to reach the internal api.service endpoint from the Portland datacenter saw NXDOMAIN responses, stale name resolution to the previous IP (10.42.16.55), or occasional DNS lookup timeouts, preventing reliable access to the service by hostname. Impact was limited to internal service discovery and resolver behavior in the us-west-1 datacenter environment following the recent record update. Approximately 14 users across the infrastructure and platform engineering groups were affected.",
+    "gold_family": 6,
+    "gold_root_cause": "Primary internal DNS resolver continued serving a stale cached response for api.service.corp.local after the A-record was updated in the internal zone, causing intermittent NXDOMAIN and old-IP answers until cache was cleared and TTL behavior normalized."
+  },
+  {
+    "query": "Engineering users and internal application teams were trying to reach internal-service1 at service1.company.local from on-premises Linux hosts in the private us-east-1 data center (Ashburn facility). For roughly the last 3 hours, name resolution intermittently returned NXDOMAIN or timed out for 30-60 seconds even though the target host was reachable by IP at 10.42.18.61. The issue was initially reported by Marcus Delgado (mdelgado, EMP-40821) and confirmed by several members of the platform engineering group. It affected internal-service1 and internal-frontend, blocked application connectivity by hostname, and coincided with resolver latency spikes and cache inconsistencies after a recent DNS zone update performed earlier that morning.",
+    "gold_family": 6,
+    "gold_root_cause": "The internal DNS resolver served a stale cached A record for service1.company.local after a recent zone update, causing intermittent mismatches between resolver cache contents and the current internal zone data and resulting in NXDOMAIN responses and lookup timeouts until the cache was flushed."
+  },
+  {
+    "query": "Multiple internal teams were trying to reach the internal application endpoint using the hostname srv-app.internal.corp, but name resolution was inconsistent across the corporate network. The issue was first reported by Tanya Reyes (emp ID EMP-40821) from the Portland office, and subsequently confirmed by engineers in the Austin office. Some clients received NXDOMAIN responses while others experienced DNS timeouts, preventing the application from being reached by name and suggesting resolver-specific or subnet-specific DNS path issues rather than a full application outage.",
+    "gold_family": 6,
+    "gold_root_cause": "Inconsistent internal DNS resolution was caused by resolver path divergence for the internal.corp zone: one or more resolvers or network segments were not consistently forwarding or serving the current zone data, and stale cached responses on affected resolvers contributed to intermittent NXDOMAIN and timeout behavior for srv-app.internal.corp."
+  },
+  {
+    "query": "I noticed that corporate Windows 11 Enterprise laptop WORKSTATION-LAPTOP-MR (asset tag SLS-4821) assigned to Marcus Reeves (mreeves, employee ID E-50274) in the Dallas office is flagged as noncompliant for disk encryption in Intune Device Compliance. The BitLocker policy appeared assigned in Microsoft Endpoint Manager and the device intermittently reported encrypted in MDM, but local BitLocker status showed encryption was not properly enabled and no protector was present. The recovery key was not visible in the tenant, preventing reliable recovery-key-backed encrypted boot support and leaving the device out of compliance. Marcus reported the issue after receiving a compliance notification email at marcus.reeves@corplabs.com.",
+    "gold_family": 13,
+    "gold_root_cause": "BitLocker policy was assigned, but the endpoint did not have a valid TPM/recovery protector in place and repeated recovery key escrow attempts to Intune failed, leaving MDM compliance state out of sync with the local BitLocker configuration."
+  },
+  {
+    "query": "A corporate Windows 10 21H2 laptop, WORKSTATION-LAPTOP-MH (asset tag PC-1234), assigned to Marco Hoffmann (emp ID EMP-90214) in the Frankfurt office, was flagged noncompliant in Intune because disk encryption was not fully compliant. I could not complete required corporate compliance checks because BitLocker protection showed as suspended and the management service did not have an escrowed recovery key available for support recovery. The device was enrolled under the user account mhoffmann and had IP 10.42.17.88 at the time of enrollment. Enrollment evidence indicated the issue started during initial device enrollment when recovery key backup failed with error 0x87D1FDE8.",
+    "gold_family": 13,
+    "gold_root_cause": "BitLocker recovery key escrow failed during initial MDM enrollment, leaving the device with a protector present but no recovery key recorded in the Device Compliance Service, while BitLocker protection remained suspended."
+  },
+  {
+    "query": "Corporate Windows 10 Azure AD joined laptop (hostname: WORKSTATION-DELL-MR, asset tag FIN-4821) assigned to Maria Reyes (mreyes, employee ID E-90274) in the Chicago office was reported as noncompliant for disk encryption by the Device Compliance Service. I could not satisfy the required BitLocker protection state because the OS volume (C:) was not encrypted, the TPM-based protector was not initialized, and the BitLocker recovery key was not escrowed to Azure AD during Intune enrollment, affecting endpoint compliance for the device. The user contacted the helpdesk at ext. 312-555-0148 after receiving the noncompliance notification.",
+    "gold_family": 13,
+    "gold_root_cause": "The device TPM was present but not initialized for BitLocker use, which prevented creation of the TPM protector on the OS volume. Because the protector was missing, the Intune disk encryption policy could not complete successfully and the recovery key was not escrowed to Azure AD."
+  },
+  {
+    "query": "I have a corporate Windows 10 laptop (hostname LAPTOP-SALES-MR, asset tag EP-04821) assigned to Marcus Reeves (employee ID EMP-20947) becoming very slow immediately after sign-in. CPU remained elevated for several minutes, Microsoft Office and Outlook opened slowly, and normal post-login work was delayed. The device is located at the Charlotte office and connects via IP 10.22.48.115. Diagnostics tied the slowdown to Windows Defender (MsMpEng.exe) processing a queued/full scan at login, with low free disk space and multiple startup items increasing startup resource contention on the domain-joined endpoint.",
+    "gold_family": 1,
+    "gold_root_cause": "A backlog of endpoint protection scans was triggered at user login, causing Windows Defender to consume sustained CPU while low free disk space and several startup items amplified the performance degradation."
+  },
+  {
+    "query": "User Marco Pellegrini (emp ID: EMP-4821) on a Windows 10 Dell Latitude 7400 (hostname: WORKSTATION-LATITUDE-MP) reported severe laptop slowdown immediately after login, with CPU sustained at 90-100%, fan noise increasing, and common applications such as Teams, OneDrive, and Chrome taking 20-60+ seconds to open. The issue briefly improved after cleanup and startup reduction, then recurred the next morning after an overnight Windows Defender full scan, impacting normal post-login productivity. User is based in the Portland office and needs the laptop for client-facing sales demos.",
+    "gold_family": 1,
+    "gold_root_cause": "Windows Defender scheduled full scan backlog caused sustained CPU and disk contention after login, and the impact was amplified by resource-heavy startup applications including Teams and OneDrive."
+  },
+  {
+    "query": "I am reporting that a corporate Dell Latitude (hostname LAPTOP-DL-RMORALES) assigned to employee Ricardo Morales (EMP-90274) running Windows 10 Pro 21H2 becomes extremely slow immediately after login. CPU rises to 90-100% within a few minutes, Endpoint Protection and related svchost activity consume most resources, and Outlook, Teams, and Chrome can take more than 30 seconds to open. Issue started after a recent policy refresh pushed from the Endpoint Management console and recurred after a prior startup-item cleanup performed by desktop support, preventing normal post-login work. The device is used daily at the Philadelphia office and connects via IP 10.42.18.97.",
+    "gold_family": 1,
+    "gold_root_cause": "Endpoint Protection definition and scan backlog was queued to run at user login after a recent policy refresh, causing sustained high CPU and delayed application launches."
+  },
+  {
+    "query": "User Priya Nair (EMP-40821) is unable to sync their Exchange Online mailbox in Outlook mobile on a corporate managed iPhone. Beginning this morning around 09:45 local time, new messages stopped appearing and the Outlook app intermittently shows a disconnected state, preventing normal mobile email access. The user's mailbox is priya.nair@corplabs.com. Initial context indicates the device (IPHONE-PNAIR) is MDM-managed and connecting from the Austin office, but the exact iOS version, Outlook build, and last known successful sync time were not available at intake.",
+    "gold_family": 12,
+    "gold_root_cause": "Outlook mobile sync was interrupted by a stale mobile mail profile or device partnership state on the managed iPhone. Exchange Online service impact was not indicated, and the reported intermittent disconnected status aligned with a client-side mobile sync state issue that required profile and partnership refresh."
+  },
+  {
+    "query": "I was trying to receive new email in Outlook on my iPhone (IPHONE-MREEVES) but the mobile client stopped syncing this morning around 8:45 AM EST and showed a disconnected state. Desktop Outlook on my workstation WORKSTATION-MREEVES initially showed the same symptom, but a desktop profile rebuild restored mail flow there while the mobile app continued to fail with ActiveSync sync errors, including 0x800CCC0E, and intermittent Exchange Online HTTP 429 throttling responses. My mailbox is mreeves@corplabs.com and I'm based in the Charlotte office. The issue blocked timely mobile email access and showed mixed client-side and server-side indicators. Please prioritize \u2014 I have client meetings all afternoon and need mobile access.",
+    "gold_family": 12,
+    "gold_root_cause": "Primary cause was Exchange Online throttling affecting the mobile ActiveSync/Outlook mobile connection for the mailbox, evidenced by intermittent HTTP 429 responses and recovery after a temporary throttle exception was applied. A separate stale desktop Outlook profile also contributed to the initial desktop symptom, which created conflicting evidence but was not the remaining cause of the mobile sync failure."
+  },
+  {
+    "query": "I'm Marcus Reeves (employee ID EMP-40291) from the Columbus office. I was trying to use the Outlook desktop client on my workstation WORKSTATION-LAPTOP-MR (IP 10.42.18.77) running Windows 10, but the mailbox for mreeves@corplabs.com stopped updating this morning and Outlook showed a Disconnected state. New mail continued to arrive on the mobile client, indicating the Exchange Online mailbox itself remained available while the desktop client could not synchronize. The issue blocked normal desktop email access and was consistent with a local Outlook profile or OST cache problem rather than a service-side outage.",
+    "gold_family": 12,
+    "gold_root_cause": "Stale Outlook desktop profile with a profile token mismatch and corrupted local OST cache caused the client to disconnect from Exchange Online and stop synchronizing the mailbox."
+  },
+  {
+    "query": "Users in the Chicago office were trying to print through shared queues hosted on PrintServer01 after a recent printer driver deployment pushed by the IT packaging team. Multiple printers appeared offline and submitted jobs remained stuck in a spooling state, preventing employees from completing normal printing across departments. The issue was first reported by Maria Gonzalez (EMP-40291) from the Finance department and quickly confirmed by additional users. The issue affected the on-premises Windows Server 2019 print server and began after the driver update.",
+    "gold_family": 5,
+    "gold_root_cause": "A corrupt printer driver package deployed to PrintServer01 created a hash mismatch and prevented the print subsystem from loading the driver correctly, causing printers to show offline and queued jobs to remain stuck in spooling."
+  },
+  {
+    "query": "Multiple office users on Floor 3 in the Charlotte office were unable to print to the shared \\\\PRNSRV-CLT-01\\\\HP-LaserJet queue after a Windows update (KB5034441) was applied earlier that morning. Print jobs submitted by users including Maria Gonzalez (emp ID EMP-30291) and others remained stuck for more than an hour. Print Management showed the queue status as 'Driver unavailable', and clients saw the printer as offline. Restarting client machines \u2014 including WORKSTATION-PC-MG and WORKSTATION-PC-DL \u2014 did not clear the condition, blocking normal printing to the main office HP LaserJet 4250 from the on-premise print server. Ticket was initially reported by Maria Gonzalez via phone at ext. 4718.",
+    "gold_family": 5,
+    "gold_root_cause": "Approved HP Universal printer driver package on the Windows Server 2019 Print Server was corrupted or removed after the morning Windows update, causing the shared queue to report 'Driver unavailable', leave jobs stuck in the spooler, and present the printer as offline to clients."
+  },
+  {
+    "query": "Accounting users in the Frankfurt office were trying to print urgent month-end reconciliation documents through the shared Accounting-Queue (PRN-Q2) on print server PRN-SRV01. The issue was first reported by Maria Kessler (emp ID AE-40218) who noticed that multiple jobs submitted by her team remained stuck in the queue, the printer appeared offline, and cancel attempts did not clear the backlog. The issue blocked immediate printing for the entire Accounting group until the queue and driver problem on the server were corrected.",
+    "gold_family": 5,
+    "gold_root_cause": "Corruption in the HPUniversal_6.8 printer driver package on PRN-SRV01 caused the Windows print spooler to fail loading the driver DLL, which left PRN-Q2 jobs stuck in the queue and preserved a stale queue mapping for the Accounting printer."
+  },
+  {
+    "query": "I was trying to open the Finance department folder on the mapped network share \\\\FINANCE\\Shared\\Finance from my Windows 10 workstation (WORKSTATION-PC-RG, IP 10.22.14.87). The share repeatedly prompted for credentials and then returned \"Access is denied,\" preventing access to department files on the SMB file server. My username is rgarcia and I'm based in the Charlotte office. Impact was limited to my access to the Finance folder while the shared drive itself remained available for other team members.",
+    "gold_family": 4,
+    "gold_root_cause": "User account was missing membership in the approved Active Directory security group that grants access to the Finance shared drive, and the endpoint was still presenting stale cached credentials/token data for the mapped drive session."
+  },
+  {
+    "query": "I was trying to open the Finance shared drive at \\\\fileserver01\\Finance from a mapped network drive on my Windows 10 workstation (WORKSTATION-FIN-LM). The drive repeatedly prompted for credentials under my account lmoretti and then returned \"Access is denied,\" and I could not open a specific department folder needed for Finance work. Impact was limited to my access path from the Birmingham office, while server-side checks also showed intermittent NTFS permission errors on the target folder. My employee ID is EMP-40821 and I can be reached at lmoretti@corplabs.com or ext 4417.",
+    "gold_family": 4,
+    "gold_root_cause": "Broken NTFS permission inheritance on the Finance folder caused effective permissions to be inconsistent with the intended AD security group access, while stale cached credentials and an outdated user token contributed to repeated credential prompts until access was refreshed."
+  },
+  {
+    "query": "I was trying to open the Finance department shared folder at \\\\fileserver\\Finance from a Windows 10 laptop (hostname LAPTOP-FIN-MKR) using a mapped network drive (F:). The drive repeatedly prompted for credentials and then returned \"Access is denied,\" preventing access to department files that other Finance team members could still open. My username is mkrueger and my employee ID is EMP-40291. The issue appeared to affect this account only and followed a permissions/policy mismatch on the shared drive path. I'm based in the Charlotte office and need access restored urgently for end-of-quarter reporting.",
+    "gold_family": 4,
+    "gold_root_cause": "The user's account was missing membership in the approved Dept_Finance access group, the Finance folder had broken NTFS permission inheritance, and a stale shared-drive policy reference contributed to outdated access behavior and repeated credential prompts."
+  },
+  {
+    "query": "I was trying to install SalesApp from Software Center on my managed Windows 10/11 device (WORKSTATION-SALES-MR, IP 10.28.44.117) in the co-managed ConfigMgr and Intune environment. My account (mreeves@corplabs.com, employee ID EMP-20418) is part of the US-East Sales team based out of the Richmond office. The installation was blocked with the message \"Installation blocked by policy\" and error 0x80180014, and the application was also not visible in Company Portal for my user account (mreeves). This prevented me from self-installing the required business application, and investigation focused on entitlement targeting and policy assignment visibility.",
+    "gold_family": 14,
+    "gold_root_cause": "User was not assigned to the required SalesApp entitlement group, so the app deployment did not target the user and the install failed the policy entitlement check."
+  },
+  {
+    "query": "Marcus Delgado (EMP-40821) in the Sales group was trying to install SalesApp from Software Center on his managed Windows 10 21H2 device (WORKSTATION-LAPTOP-MD, IP 10.22.47.113), but the application was not visible and manual install attempts failed with PolicyCheckFailed. Intune showed the device was not targeted for the app, blocking Marcus from installing required sales software at the Charlotte office until entitlement and policy assignment were corrected.",
+    "gold_family": 14,
+    "gold_root_cause": "SalesApp was not available because the user/device was missing from the required entitlement group, and separate installer attempts were blocked by Endpoint Protection because the package was not yet approved by policy."
+  },
+  {
+    "query": "I was trying to install an approved application (Adobe Creative Cloud) from Software Center on my managed Windows 10 21H2 endpoint WORKSTATION-DL-4417, but the app was either missing from the available applications list or failed immediately with a policy entitlement error when launched. My name is Derek Lewis (employee ID EMP-90234) and I'm based in the Charlotte office. Software Center reported an entitlement-related policy check failure and Intune showed the device was enrolled and healthy, but the required app assignment was not targeted to my user account dlewis@corplabs.com, blocking software installation. My device IP is 10.42.18.77.",
+    "gold_family": 14,
+    "gold_root_cause": "The user/device was not a member of the required Intune entitlement group for the application, so the app deployment was not targeted and Software Center blocked installation during policy evaluation."
+  },
+  {
+    "query": "Marcus Delgado on managed Windows 11 device WORKSTATION-ENGR-MD (hostname WORKSTATION-ENGR-MD) in Engineering at the Raleigh office was trying to install AppX from Software Center, but the application was not visible for the device and the installer returned \"blocked by policy\" when attempted from IP 10.42.17.89. The issue reoccurred after an earlier partial fix, preventing Marcus from completing the AppX installation until entitlement targeting, policy evaluation, and security blocking were corrected. Ticket submitted by mdelgado (EMP-40821).",
+    "gold_family": 10,
+    "gold_root_cause": "Stale Intune device inventory prevented the correct AppX entitlement and application targeting from appearing on the endpoint, and Endpoint Protection policy was still blocking the approved installer, causing Software Center to show the app as unavailable and the install attempt as blocked by policy."
+  },
+  {
+    "query": "I am trying to install Contoso Secure Client v4.7.2 from Software Center on my corporate Windows 10 21H2 laptop (hostname WORKSTATION-LAPTOP-MK), but the install is blocked before the installer launches. Software Center indicates Endpoint Protection blocked the application with error 'Policy check failed: entitlement not found' and the policy evaluation fails, preventing me from completing the software install needed for my field work out of the Frankfurt office. My employee ID is EMP-40291 and my username is mkovacs. Restarting the laptop, restarting Software Center, and forcing an Intune sync did not clear the block. I need this resolved urgently as I have client meetings starting Monday.",
+    "gold_family": 10,
+    "gold_root_cause": "Endpoint Protection and application entitlement policy did not allow the Contoso Secure Client installer on the device; the install was blocked by security policy and the required software entitlement needed verification and synchronization."
+  },
+  {
+    "query": "I was trying to install Acme Tools v4.2 from Software Center on my Windows 10 21H2 managed device (WORKSTATION-DT-MREEVES), but the install was blocked with the message 'Installation blocked by policy.' The application was also not visible in Intune for the device even though the endpoint was enrolled and compliant. My username is mreeves (employee ID EMP-40821) and I need this software to complete a project deliverable for the Portland engineering team. I've confirmed my device IP is 10.22.47.118 and it shows as compliant in the Company Portal.",
+    "gold_family": 10,
+    "gold_root_cause": "The user was not a member of the Intune entitlement group assigned to Acme Tools, so the application policy was not targeted to the user/device and Software Center blocked the installation."
+  },
+  {
+    "query": "Multiple Sales users in the Charlotte office were trying to access Salesforce and other SaaS applications through the SSO Portal, but after starting Okta/Azure AD single sign-on they were repeatedly returned to the MFA challenge instead of completing sign-in. The issue was initially reported by Rachel Dominguez (rdominguez@corplabs.com) and affected at least six members of the Sales team. The issue began after the morning identity sync at approximately 08:15 ET, blocked access to business applications, and affected users could not finish authentication even after responding to MFA prompts on their devices.",
+    "gold_family": 8,
+    "gold_root_cause": "Stale MFA enrollment records remained on affected user accounts after the Azure AD to Okta identity sync, causing enrolled authenticators and group-based policy evaluation to mismatch during SSO and resulting in repeated MFA challenges instead of successful session completion."
+  },
+  {
+    "query": "I am blocked from reaching SaaS applications through the SSO Portal. My username is mreeves and after successful primary SSO sign-in at https://sso.corplabs.com, the session returns to the MFA challenge repeatedly instead of completing access. I report authenticator codes from Microsoft Authenticator appear valid on my phone, but the MFA step never completes and no explicit error code is shown. I'm working from the Denver office on my laptop WORKSTATION-LAPTOP-MR. Affected identity path includes Okta/Azure AD backed SSO for SaaS Portal applications, with missing device and authenticator version details limiting initial triage. Please help \u2014 I have a client deliverable due today.",
+    "gold_family": 8,
+    "gold_root_cause": "User account had a likely stale or misaligned MFA factor state causing the identity flow to re-challenge after primary SSO authentication. Contributing factors included missing endpoint/device context and the possibility of authenticator time drift, but the most actionable service-side cause is stale MFA enrollment requiring reset and re-enrollment verification against current access policy."
+  },
+  {
+    "query": "A small group of contractor users reported being unable to complete sign-in through the SSO Portal for Salesforce and Office365. Users including Maria Delgado (mdelgado@externalsales.net) and Raj Patel (rpatel@externalsales.net) stated they were being returned to the MFA screen after approving their Okta Verify challenge, but the behavior was inconsistent and could not be reproduced the same way for every affected account. The issue was first reported by the contractors' onboarding coordinator, Kevin Marsh (EMP-40291), from the Charlotte office. The impact was intermittent access failure for recently onboarded external users in the Sales contractor group.",
+    "gold_family": 8,
+    "gold_root_cause": "Suspected incomplete or disabled MFA enrollment on a subset of contractor accounts after identity synchronization, with insufficient evidence to exclude an additional policy evaluation issue."
+  },
+  {
+    "query": "I was trying to connect to the corporate GlobalProtect VPN from my managed Windows 10 21H2 laptop (WORKSTATION-LP-MGARCIA) at the Frankfurt office. My username is mgarcia and I authenticate via Okta MFA push to my phone. The Okta MFA approval succeeded, but the VPN tunnel disconnected within about 10 seconds after authentication and internal resources such as the intranet (https://intranet.corplabs.com) and file shares (\\\\fs-emea-01.corplabs.internal\\shared) became unreachable. My client IP before the drop was 10.47.132.88. The issue recurred after a recent device certificate renewal pushed by the Device Certificate Service, indicating the certificate update alone did not correct the client profile state. I need VPN access restored urgently for a project deadline \u2014 please contact me at maria.garcia@corplabs.com or ext 4471 if needed.",
+    "gold_family": 9,
+    "gold_root_cause": "GlobalProtect client retained a stale VPN profile after device certificate renewal, causing a mismatch between the renewed certificate and active VPN profile and terminating the tunnel immediately after successful MFA."
+  },
+  {
+    "query": "Remote users on managed Windows 10 devices in the Frankfurt office were trying to connect to the corporate GlobalProtect VPN (gateway vpn-emea.corplabs.net) to reach internal resources such as the CRM, file share, and intranet. After approving the Okta MFA prompt, the VPN tunnel established briefly and then disconnected, leaving internal applications unreachable. The issue was initially reported by Elena Vasquez (emp ID EMP-40821) and affected a small group of remote workers in her team. Normal remote access was blocked until endpoint certificate validation was corrected.",
+    "gold_family": 9,
+    "gold_root_cause": "Expired device certificate on affected managed endpoints caused GlobalProtect certificate validation to fail immediately after successful Okta MFA, resulting in tunnel tear-downs and loss of access to internal applications."
+  },
+  {
+    "query": "A subset of remote users on managed Windows 10 laptops in the Charlotte office could complete Okta MFA for GlobalProtect, but the VPN tunnel disconnected within about 10 seconds after approval. The issue was initially reported by Maria Gonzalez (mgonzalez, EMP-40218) and confirmed by two other members of the RemoteWorkers group. While the disconnect occurred, internal applications such as SalesPortal and the HR Intranet were unreachable from their endpoints. The issue began after the recent certificate rotation window on 2026-04-12 and blocked normal remote access to internal resources.",
+    "gold_family": 9,
+    "gold_root_cause": "The affected endpoint had an expired device certificate and a stale GlobalProtect profile cache. MFA succeeded in Okta, but the gateway session was terminated during post-auth validation because the endpoint certificate no longer matched a current valid enrolled VPN profile."
+  },
+  {
+    "query": "Multiple employees in the Denver HQ building were trying to connect managed laptops and mobile devices to the Corporate Wi-Fi SSID (CorpNet-Secure) starting around 08:00 on April 26. Devices could associate to the SSID but then showed no network access and disconnected repeatedly across Windows, macOS, iOS, and Android, blocking normal internet and corporate network use for staff on the affected floors (primarily floors 2\u20134). The issue was first reported by Maria Gonzalez (mgonzalez@corplabs.com) and subsequently confirmed by at least 40 additional users. Affected hostnames included WORKSTATION-LAPTOP-MG and several other managed endpoints.",
+    "gold_family": 11,
+    "gold_root_cause": "The 802.1X/RADIUS server certificate used for Corporate Wi-Fi authentication expired, causing EAP-TLS certificate validation failures and NAC denial after association."
+  },
+  {
+    "query": "Users in the London office were able to join the Corporate Wi-Fi SSID (CorpWiFi-5G) and complete 802.1X authentication via ClearPass NAC, but devices then showed \"No network access\" and could not reach internal resources. The issue started after an overnight configuration push at approximately 02:30 UTC on 2026-04-27 and affected both laptops and mobile devices across floors 3\u20135 of the London building. Staff member Rachel Nguyen (emp ID EMP-40821) first reported the problem at 08:15 local time, and multiple other users including contractor David Kowalski confirmed the same symptoms. The issue blocked normal corporate network access for staff and contractors, preventing access to intranet portals and shared drives.",
+    "gold_family": 11,
+    "gold_root_cause": "An incorrect AD group-to-NAC policy mapping introduced during the overnight configuration push assigned valid authenticated users to the Quarantined access role instead of the normal corporate access policy."
+  },
+  {
+    "query": "I'm using a Windows 10 laptop (WORKSTATION-LAPTOP-MK, IP 10.42.17.89) in the Newark office, US-East Engineering. After joining the Corp-WiFi SSID this morning, my device showed \"Connected, no internet\" and I could not reach any internal resources (e.g., SharePoint, Jira) or external sites. The connection also intermittently dropped and reconnected on its own. This started after the wireless controller certificate refresh/update performed earlier today by the network team. My employee ID is E-20841 and my username is mkim. The issue completely blocked my normal corporate network access over Wi-Fi.",
+    "gold_family": 11,
+    "gold_root_cause": "Expired EAP certificate on the Wireless Controller caused 802.1X post-auth validation failures, which prevented successful NAC/DHCP completion after SSID association."
+  }
+]

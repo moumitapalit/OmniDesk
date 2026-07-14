@@ -1,0 +1,252 @@
+[
+  {
+    "query": "Does the adherence and accountability policy apply to business partners as well as employees?",
+    "gold_id": 114,
+    "topic": "other"
+  },
+  {
+    "query": "What happens if I don't use my compensatory off within 60 days?",
+    "gold_id": 25,
+    "topic": "comp_off"
+  },
+  {
+    "query": "If someone at Kreeda Labs reports a concern, can they be punished or harassed for it?",
+    "gold_id": 281,
+    "topic": "whistleblower"
+  },
+  {
+    "query": "What happens if an error is found in a document after it has been approved?",
+    "gold_id": 250,
+    "topic": "policy_admin"
+  },
+  {
+    "query": "What types of questions should be directed to the Compliance Officer instead of HR?",
+    "gold_id": 228,
+    "topic": "ethics_conduct"
+  },
+  {
+    "query": "Do public holidays have a different overtime calculation?",
+    "gold_id": 142,
+    "topic": "overtime"
+  },
+  {
+    "query": "How does the Anti-Bribery & Corruption Policy support ethical business practices at Kreeda Labs?",
+    "gold_id": 104,
+    "topic": "anti_bribery"
+  },
+  {
+    "query": "If I file a complaint, when can I expect to hear back from the PCC?",
+    "gold_id": 558,
+    "topic": "other"
+  },
+  {
+    "query": "What should someone do if they are accused of violating a company policy?",
+    "gold_id": 89,
+    "topic": "other"
+  },
+  {
+    "query": "What types of information are considered confidential under this policy?",
+    "gold_id": 604,
+    "topic": "other"
+  },
+  {
+    "query": "If I have a question about the employee handbook, who should I talk to?",
+    "gold_id": 432,
+    "topic": "other"
+  },
+  {
+    "query": "Is compensatory off automatically granted to all employees who work extra hours?",
+    "gold_id": 32,
+    "topic": "comp_off"
+  },
+  {
+    "query": "Who has the authority to approve compensatory off for leadership roles?",
+    "gold_id": 30,
+    "topic": "comp_off"
+  },
+  {
+    "query": "Who is typically responsible for reviewing and updating organizational policies?",
+    "gold_id": 95,
+    "topic": "other"
+  },
+  {
+    "query": "Can you give an example of a trigger that would require an immediate policy update?",
+    "gold_id": 223,
+    "topic": "policy_admin"
+  },
+  {
+    "query": "How does Kreeda Labs ensure impartiality and fairness when reviewing whistleblower reports?",
+    "gold_id": 238,
+    "topic": "whistleblower"
+  },
+  {
+    "query": "If I am unsure whether something is a violation, should I still report it?",
+    "gold_id": 517,
+    "topic": "other"
+  },
+  {
+    "query": "What does it mean when a company says employees must comply with laws and regulations?",
+    "gold_id": 616,
+    "topic": "ethics_conduct"
+  },
+  {
+    "query": "If my project deliverables are at risk, can I still take compensatory off?",
+    "gold_id": 27,
+    "topic": "comp_off"
+  },
+  {
+    "query": "How is confidentiality maintained during the complaint process?",
+    "gold_id": 574,
+    "topic": "other"
+  },
+  {
+    "query": "What is the policy for reporting gifts and entertainment at Kreeda Labs?",
+    "gold_id": 203,
+    "topic": "anti_bribery"
+  },
+  {
+    "query": "How can I get more information about the company's policies?",
+    "gold_id": 429,
+    "topic": "other"
+  },
+  {
+    "query": "What is the role of the Compliance Officer in a company?",
+    "gold_id": 225,
+    "topic": "ethics_conduct"
+  },
+  {
+    "query": "What should I do if I have suggestions for improving the POSH policy?",
+    "gold_id": 459,
+    "topic": "other"
+  },
+  {
+    "query": "Can employees share confidential information with anyone inside the company?",
+    "gold_id": 603,
+    "topic": "other"
+  },
+  {
+    "query": "What does 'good faith' mean in the context of reporting concerns at Kreeda Labs?",
+    "gold_id": 284,
+    "topic": "other"
+  },
+  {
+    "query": "Can employees provide feedback on policy updates?",
+    "gold_id": 6,
+    "topic": "policy_admin"
+  },
+  {
+    "query": "If I need clarification about a company policy, what should I do?",
+    "gold_id": 163,
+    "topic": "other"
+  },
+  {
+    "query": "What resources are usually provided to help with compliance?",
+    "gold_id": 348,
+    "topic": "ethics_conduct"
+  },
+  {
+    "query": "How can organizations ensure their policies remain up to date?",
+    "gold_id": 159,
+    "topic": "other"
+  },
+  {
+    "query": "Who is usually responsible for reviewing and updating company policies?",
+    "gold_id": 220,
+    "topic": "policy_admin"
+  },
+  {
+    "query": "Why is training provided for the Code of Business Conduct?",
+    "gold_id": 344,
+    "topic": "ethics_conduct"
+  },
+  {
+    "query": "How often should a policy be reviewed to stay compliant?",
+    "gold_id": 94,
+    "topic": "policy_admin"
+  },
+  {
+    "query": "Who is responsible for drafting policies at Kreeda Labs?",
+    "gold_id": 389,
+    "topic": "other"
+  },
+  {
+    "query": "How does following the Anti-Bribery & Corruption Policy benefit Kreeda Labs?",
+    "gold_id": 99,
+    "topic": "anti_bribery"
+  },
+  {
+    "query": "If I am taking leave for more than two days, is there anything specific I need to do?",
+    "gold_id": 367,
+    "topic": "leave"
+  },
+  {
+    "query": "Is there a specific email for reporting ethical issues at Kreeda Labs?",
+    "gold_id": 352,
+    "topic": "ethics_conduct"
+  },
+  {
+    "query": "What happens if an employee engages in illegal or unethical conduct?",
+    "gold_id": 618,
+    "topic": "ethics_conduct"
+  },
+  {
+    "query": "What happens after I submit an anonymous report?",
+    "gold_id": 270,
+    "topic": "ethics_conduct"
+  },
+  {
+    "query": "What details should I include in my email to the manager when applying for compensatory off?",
+    "gold_id": 44,
+    "topic": "comp_off"
+  },
+  {
+    "query": "What happens if someone violates the POSH policy at Kreeda Labs?",
+    "gold_id": 470,
+    "topic": "other"
+  },
+  {
+    "query": "What are the ways to submit a complaint to the PCC?",
+    "gold_id": 549,
+    "topic": "other"
+  },
+  {
+    "query": "Why is it important to mention 'Drafted by' and 'Reviewed & Approved by' in official documents?",
+    "gold_id": 127,
+    "topic": "other"
+  },
+  {
+    "query": "Can you tell me the role of Mr. Saurabh Bhansali at Kreeda Labs?",
+    "gold_id": 387,
+    "topic": "other"
+  },
+  {
+    "query": "Why is it important for business partners to be informed about the anti-bribery and anti-corruption policy?",
+    "gold_id": 80,
+    "topic": "anti_bribery"
+  },
+  {
+    "query": "Why does Kreeda Labs have a strict anti-retaliation policy?",
+    "gold_id": 565,
+    "topic": "whistleblower"
+  },
+  {
+    "query": "Can you give an example of a situation where a policy review led to important changes?",
+    "gold_id": 300,
+    "topic": "policy_admin"
+  },
+  {
+    "query": "What should an employee do if they witness a violation of the Code of Conduct at Kreeda Labs?",
+    "gold_id": 643,
+    "topic": "ethics_conduct"
+  },
+  {
+    "query": "Could legal action be taken against an employee for violating the Code of Conduct?",
+    "gold_id": 633,
+    "topic": "ethics_conduct"
+  },
+  {
+    "query": "If I have an emergency and cannot use MS Teams, what should I do?",
+    "gold_id": 370,
+    "topic": "other"
+  }
+]

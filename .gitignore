@@ -1,0 +1,7 @@
+.env
+uv.lock
+main.py
+.python-version
+.DS_Store
+__pycache__/
+*.pyc

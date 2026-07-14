@@ -1,0 +1,20 @@
+[project]
+name = "omnidesk"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "datasets>=5.0.0",
+    "python-dotenv>=1.2.2",
+    "datasets>=2.19",
+    "qdrant-client>=1.12",
+    "fastembed>=0.4",
+    "langgraph>=0.2",
+    "langchain>=0.3",
+    "langchain-ollama>=0.2",
+    "langchain-openai>=0.2",
+    "openai>=1.40",
+    "scikit-learn>=1.5",
+    "pydantic>=2.7",
+]
