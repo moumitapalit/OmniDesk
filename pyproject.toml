@@ -17,4 +17,5 @@ dependencies = [
     "openai>=1.40",
     "scikit-learn>=1.5",
     "pydantic>=2.7",
+    "streamlit>=1.38",
 ]
