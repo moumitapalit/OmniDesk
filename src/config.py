@@ -28,6 +28,17 @@ else:
 SPARSE_MODEL = "Qdrant/bm25"
 N_IT_FAMILIES = 15
 
+# --- Jira (support ticket escalation) ---------------------------------------
+# Non-secret settings live here; only the API token is a secret (see .env).
+# JIRA_AUTH_EMAIL is the service account used to authenticate to the Jira API
+# (Basic Auth requires an email + token pair) -- NOT the reporting employee's
+# email, which is collected at runtime and never stored here.
+JIRA_URL = "https://moumitapalit.atlassian.net"
+JIRA_AUTH_EMAIL = "moumitapalit@gmail.com"
+JIRA_PROJECT_KEY = "OD"
+JIRA_ISSUE_TYPE = "Submit a request or incident"
+JIRA_API_TOKEN = os.getenv("JIRA_API_TOKEN", "")
+
 # --- LLM: OpenAI if key present, else Ollama --------------------------------
 _llm = None
 
