@@ -42,6 +42,31 @@ judge_llm = get_llm()  # same model that answers -- see self-grading note below
 
 SAMPLE_SIZE = 10  # per-corpus sample size for the "should answer" query set
 
+# Hand-authored hard cases, found by probing the live pipeline. The sampled
+# fixture queries are near-verbatim copies of corpus content, so they all
+# pass trivially; these exist to show non-perfect scores in LangSmith.
+#
+# Blends two unrelated incident families (VPN cert disconnect, family 9 +
+# Intune compliance, family 3): the model tends to fabricate a causal link
+# between them and invent remediation steps found in neither family.
+HARD_FAITHFULNESS_QUERIES = [
+    "My VPN keeps disconnecting seconds after Okta MFA succeeds, and separately "
+    "Intune shows my device as noncompliant with a missing encryption signal -- "
+    "could these two issues be caused by the same underlying problem?",
+]
+
+# Rambling multi-topic query: escalation defaults stay structurally valid
+# (ticket_structure 1.0) while the drafted description is too disorganized
+# for a human agent to act on (ticket_description_quality ~0.5).
+HARD_TICKET_QUERIES = [
+    "So I have been meaning to ask about a few things -- my manager mentioned "
+    "something about a new expense system, also my badge sometimes does not work "
+    "on Mondays, and I think there was an email about updating something but I "
+    "forget what, and also is there a stipend for home internet, and one more "
+    "thing, does the pet-friendly office policy apply to the Denver location or "
+    "just headquarters?",
+]
+
 
 def _load(name: str) -> list:
     with open(name) as f:
@@ -55,12 +80,33 @@ def _answerable_sample() -> list[str]:
 
 
 def _ensure_dataset(name: str, description: str, examples: list[dict]) -> None:
-    """Create + populate a LangSmith dataset once; no-op if it already
-    exists, so re-running this script doesn't duplicate examples."""
-    if client.has_dataset(dataset_name=name):
+    """Sync a LangSmith dataset with the local fixtures, keyed on
+    inputs["query"]: create it if missing, otherwise add new queries, update
+    ones whose expected outputs changed, and remove ones no longer in the
+    fixture -- so editing eval_*.json is reflected without duplicating rows
+    that haven't changed."""
+    if not client.has_dataset(dataset_name=name):
+        client.create_dataset(dataset_name=name, description=description)
+        client.create_examples(dataset_name=name, examples=examples)
         return
-    client.create_dataset(dataset_name=name, description=description)
-    client.create_examples(dataset_name=name, examples=examples)
+
+    existing_by_query = {ex.inputs["query"]: ex for ex in client.list_examples(dataset_name=name)}
+    new_by_query = {e["inputs"]["query"]: e for e in examples}
+
+    to_create = [e for q, e in new_by_query.items() if q not in existing_by_query]
+    to_update = [
+        {"id": existing_by_query[q].id, "inputs": e["inputs"], "outputs": e["outputs"]}
+        for q, e in new_by_query.items()
+        if q in existing_by_query and existing_by_query[q].outputs != e["outputs"]
+    ]
+    to_delete = [ex.id for q, ex in existing_by_query.items() if q not in new_by_query]
+
+    if to_create:
+        client.create_examples(dataset_name=name, examples=to_create)
+    if to_update:
+        client.update_examples(dataset_name=name, updates=to_update)
+    if to_delete:
+        client.delete_examples(example_ids=to_delete)
 
 
 def _parse_judge_json(raw: str) -> dict:
@@ -155,7 +201,8 @@ def faithfulness(inputs: dict, outputs: dict) -> dict:
 
 
 def run_faithfulness() -> None:
-    examples = [{"inputs": {"query": q}, "outputs": {}} for q in _answerable_sample()]
+    queries = _answerable_sample() + HARD_FAITHFULNESS_QUERIES
+    examples = [{"inputs": {"query": q}, "outputs": {}} for q in queries]
     _ensure_dataset("omnidesk-faithfulness", "Answer groundedness in retrieved context", examples)
     evaluate(target_faithfulness, data="omnidesk-faithfulness", evaluators=[faithfulness],
              experiment_prefix="faithfulness")
@@ -264,6 +311,10 @@ def ticket_description_quality(inputs: dict, outputs: dict) -> dict:
 def run_ticket_quality() -> None:
     examples = [{"inputs": {"query": e["query"]}, "outputs": {"expected_category": "HR"}}
                 for e in _load("eval_hr_negative.json")]
+    # HARD_TICKET_QUERIES route "both" (mixed HR/IT topics), unlike the HR-only
+    # negative fixture above -- category expectation differs accordingly.
+    examples += [{"inputs": {"query": q}, "outputs": {"expected_category": "HR/IT"}}
+                 for q in HARD_TICKET_QUERIES]
     _ensure_dataset("omnidesk-ticket-quality", "Auto-drafted escalation ticket quality", examples)
     evaluate(target_ticket_quality, data="omnidesk-ticket-quality",
              evaluators=[ticket_structure, ticket_description_quality], experiment_prefix="ticket-quality")

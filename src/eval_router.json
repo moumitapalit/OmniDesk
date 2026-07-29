@@ -8,6 +8,7 @@
   {"query": "What's the status of my VPN ticket, has anyone looked at it?", "expected_route": "status"},
   {"query": "Any update on ticket OMNI-12?", "expected_route": "status"},
   {"query": "Did anyone respond to the support request I filed yesterday?", "expected_route": "status"},
+  {"query": "What is the current status of the VPN service, is it having an outage right now?", "expected_route": "it"},
   {"query": "I'm switching teams and need my email access transferred, and want to know if my old team's leave balance carries over", "expected_route": "both"},
   {"query": "My badge stopped working after HR marked me as relocated -- is this an IT or HR issue?", "expected_route": "both"},
   {"query": "asdkj alsjdla", "expected_route": "both"},
