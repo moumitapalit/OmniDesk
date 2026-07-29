@@ -4,6 +4,7 @@
 with identical code paths.
 """
 
+from langsmith import traceable
 from qdrant_client import models
 
 from config import QUERY_PREFIX, dense_model, get_qdrant, sparse_model
@@ -21,6 +22,7 @@ def _sparse_query(query: str) -> models.SparseVector:
     return models.SparseVector(indices=emb.indices.tolist(), values=emb.values.tolist())
 
 
+@traceable(run_type="retriever", name="search")
 def search(
     collection: str,
     query: str,
@@ -64,6 +66,7 @@ def search(
     return res.points
 
 
+@traceable(run_type="retriever", name="search_it_deduped")
 def search_it_deduped(query: str, mode: str = "hybrid",
                       n_families: int = 3, per_family: int = 2):
     """IT-specific retrieval: the corpus has ~50 near-duplicates per issue

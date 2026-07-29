@@ -10,6 +10,7 @@ the human-in-the-loop confirmation step.
 import re
 
 import requests
+from langsmith import traceable
 
 from config import JIRA_API_TOKEN, JIRA_AUTH_EMAIL, JIRA_ISSUE_TYPE, JIRA_PROJECT_KEY, JIRA_URL
 
@@ -36,6 +37,7 @@ def _text_doc(text: str) -> dict:
     }
 
 
+@traceable(run_type="tool", name="jira_create_ticket")
 def create_ticket(
     email: str,
     summary: str,
@@ -79,6 +81,7 @@ def create_ticket(
     return {"ok": True, "key": key, "url": f"{JIRA_URL}/browse/{key}"}
 
 
+@traceable(run_type="tool", name="jira_get_tickets_by_email")
 def get_tickets_by_email(email: str) -> dict:
     """Look up tickets previously raised by this employee (via the email label).
 
@@ -114,6 +117,7 @@ def get_tickets_by_email(email: str) -> dict:
     return {"ok": True, "tickets": tickets}
 
 
+@traceable(run_type="tool", name="jira_get_ticket_comments")
 def get_ticket_comments(issue_key: str) -> dict:
     """Fetch comments/updates on a ticket so an employee can see support-team activity."""
     if not _configured():

@@ -1,0 +1,15 @@
+[
+  {"query": "Can I carry forward my comp-off to next quarter?", "expected_route": "hr"},
+  {"query": "Am I allowed to accept a gift from a vendor?", "expected_route": "hr"},
+  {"query": "Do public holidays have a different overtime calculation?", "expected_route": "hr"},
+  {"query": "My laptop won't connect to the office VPN after the update", "expected_route": "it"},
+  {"query": "My AD account keeps locking after I reset my password", "expected_route": "it"},
+  {"query": "SharePoint access is blocked with a device compliance error", "expected_route": "it"},
+  {"query": "What's the status of my VPN ticket, has anyone looked at it?", "expected_route": "status"},
+  {"query": "Any update on ticket OMNI-12?", "expected_route": "status"},
+  {"query": "Did anyone respond to the support request I filed yesterday?", "expected_route": "status"},
+  {"query": "I'm switching teams and need my email access transferred, and want to know if my old team's leave balance carries over", "expected_route": "both"},
+  {"query": "My badge stopped working after HR marked me as relocated -- is this an IT or HR issue?", "expected_route": "both"},
+  {"query": "asdkj alsjdla", "expected_route": "both"},
+  {"query": "help", "expected_route": "both"}
+]

@@ -2,6 +2,7 @@
 
 from typing import Iterable
 
+from langsmith import traceable
 from qdrant_client import QdrantClient, models
 
 from config import DENSE_DIM, dense_model, sparse_model
@@ -23,6 +24,7 @@ def recreate_hybrid_collection(client: QdrantClient, name: str) -> None:
     )
 
 
+@traceable(run_type="embedding", name="embed_texts")
 def embed_texts(texts: list[str]):
     """Return (dense, sparse) embeddings for a list of passages."""
     dense = list(dense_model().embed(texts, batch_size=64))
@@ -30,6 +32,7 @@ def embed_texts(texts: list[str]):
     return dense, sparse
 
 
+@traceable(run_type="tool", name="upsert_hybrid")
 def upsert_hybrid(
     client: QdrantClient,
     collection: str,

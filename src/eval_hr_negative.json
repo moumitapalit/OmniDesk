@@ -1,0 +1,27 @@
+[
+  {
+    "query": "What is Kreeda Labs' policy on reimbursing employees for home internet upgrades?",
+    "gold_id": null,
+    "topic": "no_answer"
+  },
+  {
+    "query": "Does Kreeda Labs offer a four-day work week option for employees?",
+    "gold_id": null,
+    "topic": "no_answer"
+  },
+  {
+    "query": "What is the process for requesting a company-sponsored visa for international relocation?",
+    "gold_id": null,
+    "topic": "no_answer"
+  },
+  {
+    "query": "How many shares of company stock do new hires receive as part of their signing bonus?",
+    "gold_id": null,
+    "topic": "no_answer"
+  },
+  {
+    "query": "What is the recommended recipe for the cafeteria's weekly menu?",
+    "gold_id": null,
+    "topic": "no_answer"
+  }
+]
