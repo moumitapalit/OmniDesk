@@ -29,12 +29,14 @@ SPARSE_MODEL = "Qdrant/bm25"
 N_IT_FAMILIES = 15
 
 # --- Jira (support ticket escalation) ---------------------------------------
-# Non-secret settings live here; only the API token is a secret (see .env).
-# JIRA_AUTH_EMAIL is the service account used to authenticate to the Jira API
-# (Basic Auth requires an email + token pair) -- NOT the reporting employee's
-# email, which is collected at runtime and never stored here.
-JIRA_URL = "https://moumitapalit.atlassian.net"
-JIRA_AUTH_EMAIL = "moumitapalit@gmail.com"
+# JIRA_URL and JIRA_AUTH_EMAIL identify the Jira instance/service account and
+# are treated as secrets (see .env / .env.example) so they never end up
+# hardcoded in source control. JIRA_AUTH_EMAIL is the service account used to
+# authenticate to the Jira API (Basic Auth requires an email + token pair) --
+# NOT the reporting employee's email, which is collected at runtime and never
+# stored here.
+JIRA_URL = os.getenv("JIRA_URL", "")
+JIRA_AUTH_EMAIL = os.getenv("JIRA_AUTH_EMAIL", "")
 JIRA_PROJECT_KEY = "OD"
 JIRA_ISSUE_TYPE = "Submit a request or incident"
 JIRA_API_TOKEN = os.getenv("JIRA_API_TOKEN", "")
@@ -63,7 +65,7 @@ def get_llm():
 
 
 def get_qdrant() -> QdrantClient:
-    return QdrantClient(url=QDRANT_URL)
+    return QdrantClient(url=QDRANT_URL, api_key=os.getenv("QDRANT_API_KEY") or None)
 
 
 _dense = None

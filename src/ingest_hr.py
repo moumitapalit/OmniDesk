@@ -9,6 +9,7 @@ Design decisions (see README):
   whether the *right* point is retrieved for a held-out question).
 """
 
+import argparse
 import json
 import random
 
@@ -51,6 +52,11 @@ def flatten(row: dict) -> dict | None:
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--force", "-y", action="store_true",
+                        help="skip the confirmation prompt when recreating a non-empty collection")
+    args = parser.parse_args()
+
     ds = load_dataset("strova-ai/hr-policies-qa-dataset", split="train")
     pairs = [p for p in (flatten(r) for r in ds) if p]
     print(f"Loaded {len(pairs)} Q/A pairs")
@@ -64,7 +70,7 @@ def main() -> None:
     texts = [f"{p['question']}\n{p['answer']}" for p in pairs]
 
     client = get_qdrant()
-    recreate_hybrid_collection(client, HR_COLLECTION)
+    recreate_hybrid_collection(client, HR_COLLECTION, force=args.force)
     upsert_hybrid(client, HR_COLLECTION, texts, pairs)
     print(f"Upserted {len(pairs)} points into '{HR_COLLECTION}'")
 

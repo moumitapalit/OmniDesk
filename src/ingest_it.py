@@ -81,6 +81,8 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--inspect", action="store_true",
                         help="print one raw record and exit (schema check)")
+    parser.add_argument("--force", "-y", action="store_true",
+                        help="skip the confirmation prompt when recreating a non-empty collection")
     args = parser.parse_args()
 
     ds = load_dataset("ameau01/synthetic-it-support-tickets", split="train")
@@ -109,7 +111,7 @@ def main() -> None:
 
     # --- Upsert -------------------------------------------------------------
     client = get_qdrant()
-    recreate_hybrid_collection(client, IT_COLLECTION)
+    recreate_hybrid_collection(client, IT_COLLECTION, force=args.force)
     upsert_hybrid(client, IT_COLLECTION, texts, records)
     print(f"Upserted {len(records)} points into '{IT_COLLECTION}'")
 

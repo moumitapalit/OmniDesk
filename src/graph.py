@@ -30,6 +30,14 @@ llm = get_llm()
 # consistent across all three answer prompts below.
 INSUFFICIENT_INFO_PHRASE = "I don't have enough information to answer that."
 
+# Shared tone directive, included in all three answer prompts so HR, IT, and
+# combined answers read consistently regardless of which node generated them.
+TONE_GUARDRAIL = (
+    "Maintain a professional, courteous, and measured tone throughout, as "
+    "appropriate for internal workplace support. Avoid slang, jokes, sarcasm, "
+    "or casual phrasing. Do not editorialize or add personal opinions."
+)
+
 CATEGORY_BY_ROUTE = {"hr": "HR", "it": "IT", "both": "HR/IT"}
 
 
@@ -96,12 +104,14 @@ employee's question using ONLY the policy excerpts below. Do not guess and
 do not use outside knowledge. If the excerpts don't cover the question,
 respond with EXACTLY this sentence and nothing else: "{insufficient}"
 
+{tone}
+
 Policy excerpts:
 {{context}}
 
 Question: {{query}}
 
-Answer concisely.""".format(insufficient=INSUFFICIENT_INFO_PHRASE)
+Answer concisely.""".format(insufficient=INSUFFICIENT_INFO_PHRASE, tone=TONE_GUARDRAIL)
 
 IT_ANSWER_PROMPT = """You are an IT support assistant. Based on similar past
 incidents below, give: (1) the most likely root cause, (2) recommended
@@ -111,12 +121,14 @@ not guess and do not use outside knowledge. If none of the incidents are
 relevant to the new ticket, respond with EXACTLY this sentence and nothing
 else: "{insufficient}"
 
+{tone}
+
 Similar past incidents:
 {{context}}
 
 New ticket: {{query}}
 
-Diagnosis and resolution:""".format(insufficient=INSUFFICIENT_INFO_PHRASE)
+Diagnosis and resolution:""".format(insufficient=INSUFFICIENT_INFO_PHRASE, tone=TONE_GUARDRAIL)
 
 
 def _hr_context(hits) -> str:
@@ -158,6 +170,7 @@ def both_answer(state: RAGState) -> RAGState:
         "do not use outside knowledge. If the context doesn't cover the "
         f'question, respond with EXACTLY this sentence and nothing else: '
         f'"{INSUFFICIENT_INFO_PHRASE}"\n\n'
+        f"{TONE_GUARDRAIL}\n\n"
         f"{context}\n\nQuestion: {state['query']}\n\nAnswer:"
     )
     return {"answer": llm.invoke(prompt).content}

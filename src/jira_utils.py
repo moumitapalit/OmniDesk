@@ -75,7 +75,8 @@ def create_ticket(
         resp.raise_for_status()
     except requests.RequestException as exc:
         detail = getattr(exc.response, "text", str(exc)) if exc.response is not None else str(exc)
-        return {"ok": False, "error": f"Jira request failed: {detail}"}
+        print(f"Jira request failed: {detail}")  # server-side only -- never shown to the employee
+        return {"ok": False, "error": "Jira request failed. Please try again or contact IT directly."}
 
     key = resp.json()["key"]
     return {"ok": True, "key": key, "url": f"{JIRA_URL}/browse/{key}"}
@@ -103,7 +104,8 @@ def get_tickets_by_email(email: str) -> dict:
         resp.raise_for_status()
     except requests.RequestException as exc:
         detail = getattr(exc.response, "text", str(exc)) if exc.response is not None else str(exc)
-        return {"ok": False, "error": f"Jira request failed: {detail}"}
+        print(f"Jira request failed: {detail}")  # server-side only -- never shown to the employee
+        return {"ok": False, "error": "Jira request failed. Please try again or contact IT directly."}
 
     tickets = [
         {
@@ -131,7 +133,8 @@ def get_ticket_comments(issue_key: str) -> dict:
         resp.raise_for_status()
     except requests.RequestException as exc:
         detail = getattr(exc.response, "text", str(exc)) if exc.response is not None else str(exc)
-        return {"ok": False, "error": f"Jira request failed: {detail}"}
+        print(f"Jira request failed: {detail}")  # server-side only -- never shown to the employee
+        return {"ok": False, "error": "Jira request failed. Please try again or contact IT directly."}
 
     comments = []
     for c in resp.json().get("comments", []):

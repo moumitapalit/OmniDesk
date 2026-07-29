@@ -78,7 +78,10 @@ Copy `.env` (or create one) in the project root with:
 | `OPENAI_EMBEDDING_MODEL` | optional | Only used if `EMBEDDING_PROVIDER=openai`; defaults to `text-embedding-3-small`. Otherwise embeddings run locally via `fastembed`. |
 | `QDRANT_URL` | optional | Defaults to `http://localhost:6333`. |
 | `HF_TOKEN` | optional | Needed to download the HuggingFace datasets used for ingestion. |
-| `JIRA_API_TOKEN` | for escalation/status features | Jira Cloud API token. Auth email and project are set in [src/config.py](src/config.py). |
+| `JIRA_URL` | for escalation/status features | Your Jira Cloud instance URL, e.g. `https://yourorg.atlassian.net`. |
+| `JIRA_AUTH_EMAIL` | for escalation/status features | Service-account email used for Jira Basic Auth (not the reporting employee's email). |
+| `JIRA_API_TOKEN` | for escalation/status features | Jira Cloud API token. Project key/issue type are set in [src/config.py](src/config.py). |
+| `QDRANT_API_KEY` | optional | Needed only for a hosted/remote Qdrant instance that requires auth. |
 | `LANGSMITH_API_KEY`, `LANGSMITH_TRACING`, `LANGSMITH_PROJECT` | optional | Enables LangSmith tracing and is required to run `evaluate_agent.py`. |
 
 ## Running it
@@ -87,7 +90,10 @@ Copy `.env` (or create one) in the project root with:
 
 Populates the two Qdrant collections and writes eval fixtures. Run once
 before first use, and again whenever you want to rebuild from scratch (both
-scripts drop and recreate their collection):
+scripts drop and recreate their collection). If the collection already has
+points, it's snapshotted first (recoverable via `client.recover_snapshot`)
+and you'll be prompted to confirm before it's dropped; pass `--force`
+(or `-y`) to skip the prompt (e.g. in automation):
 
 ```bash
 cd src
